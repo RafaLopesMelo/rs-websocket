@@ -19,11 +19,14 @@ impl Builder {
     }
 
     pub fn build(self) -> String {
-        if self.status.is_none() {
-            panic!("`status` must be specified before build");
-        }
+        let status = self
+            .status
+            .expect("`status` must be specified before build");
 
         let mut response = String::new();
+
+        let status_line = format!("HTTP/1.1 {} {}\r\n", status.code(), status.text());
+        response.push_str(status_line.as_str());
 
         return response;
     }

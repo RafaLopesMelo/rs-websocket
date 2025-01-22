@@ -36,12 +36,12 @@ impl Request {
             .take_while(|l| !l.is_empty())
             .collect();
 
-        let fl = req[0]
+        let status_line = req[0]
             .split_whitespace()
             .map(|l| l.to_string())
             .collect::<Vec<String>>();
 
-        let protocol = fl[2].split("/").collect::<Vec<&str>>();
+        let protocol = status_line[2].split("/").collect::<Vec<&str>>();
 
         let mut headers = HashMap::new();
 
@@ -53,8 +53,8 @@ impl Request {
         }
 
         return Request {
-            method: fl[0].clone(),
-            path: fl[1].clone(),
+            method: status_line[0].clone(),
+            path: status_line[1].clone(),
             protocol_name: protocol[0].to_string(),
             protocol_version: protocol[1].to_string(),
             headers,
