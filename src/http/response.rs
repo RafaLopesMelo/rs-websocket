@@ -13,12 +13,12 @@ impl Builder {
         return self;
     }
 
-    pub fn header(mut self, key: String, value: String) -> Builder {
-        self.headers.insert(key, value);
+    pub fn header(mut self, key: &str, value: &str) -> Builder {
+        self.headers.insert(key.to_string(), value.to_string());
         return self;
     }
 
-    pub fn build(self) -> String {
+    pub fn build(self) -> Vec<u8> {
         let status = self
             .status
             .expect("`status` must be specified before build");
@@ -28,7 +28,12 @@ impl Builder {
         let status_line = format!("HTTP/1.1 {} {}\r\n", status.code(), status.text());
         response.push_str(status_line.as_str());
 
-        return response;
+        for (key, value) in self.headers {
+            let header = format!("{}: {}\r\n", key, value);
+            response.push_str(header.as_str());
+        }
+
+        return response.into_bytes();
     }
 
     pub fn new() -> Builder {

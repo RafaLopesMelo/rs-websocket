@@ -28,7 +28,7 @@ impl Request {
         return self.headers.get(&k);
     }
 
-    pub fn from_raw(s: net::TcpStream) -> Request {
+    pub fn from_raw(s: &net::TcpStream) -> Request {
         let buf = io::BufReader::new(s);
         let req: Vec<String> = buf
             .lines()

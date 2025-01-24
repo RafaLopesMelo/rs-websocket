@@ -1,3 +1,7 @@
-pub mod request;
-pub mod response;
-pub mod status_code;
+mod request;
+mod response;
+mod status_code;
+
+pub use request::Request;
+pub use response::Builder;
+pub use status_code::StatusCode;
