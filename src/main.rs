@@ -1,7 +1,7 @@
 mod http;
 mod ws;
 
-use http::Request;
+use http::request::Request;
 
 use std::io::Write;
 use std::net;
@@ -15,7 +15,7 @@ fn main() {
 
         let response = ws::handshake(&req);
 
-        let _ = stream.write(&response);
+        let _ = stream.write(&response.unwrap());
         let _ = stream.flush();
     }
 }
