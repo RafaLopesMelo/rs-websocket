@@ -1,9 +1,5 @@
 use super::error::HandshakeError;
-use crate::http;
-
-use base64::engine::general_purpose::STANDARD;
-use base64::Engine;
-use sha1::Digest;
+use crate::{base64, http, sha1};
 
 const WS_SERVER_KEY: &str = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
@@ -40,9 +36,7 @@ pub fn handshake(req: &http::request::Request) -> Result<Vec<u8>, HandshakeError
         .header("sec-websocket-key")
         .ok_or(HandshakeError::InvalidWSKey)?;
 
-    let ws_key = STANDARD
-        .decode(base64_ws_key)
-        .map_err(|_| HandshakeError::InvalidWSKey)?;
+    let ws_key = base64::decode(base64_ws_key).map_err(|_| HandshakeError::InvalidWSKey)?;
 
     if ws_key.len() != 16 {
         return Err(HandshakeError::InvalidWSKey);
@@ -56,16 +50,11 @@ pub fn handshake(req: &http::request::Request) -> Result<Vec<u8>, HandshakeError
         return Err(HandshakeError::InvalidWSVersion);
     }
 
-    let str_ws_key = std::str::from_utf8(&ws_key).map_err(|_| HandshakeError::InvalidWSKey)?;
-
-    let mut str_ws_accept = String::from(str_ws_key);
+    let mut str_ws_accept = String::from(ws_key);
     str_ws_accept.push_str(WS_SERVER_KEY);
 
-    let mut hasher = sha1::Sha1::new();
-    hasher.update(str_ws_accept);
-    let ws_accept_bytes = &hasher.finalize() as &[u8];
-
-    let ws_accept = STANDARD.encode(ws_accept_bytes);
+    let ws_accept_bytes = sha1::encode(str_ws_accept);
+    let ws_accept = base64::encode(&ws_accept_bytes);
 
     let builder = http::response::Builder::new();
     let response = builder

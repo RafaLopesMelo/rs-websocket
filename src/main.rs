@@ -1,4 +1,6 @@
+mod base64;
 mod http;
+mod sha1;
 mod ws;
 
 use http::request::Request;
